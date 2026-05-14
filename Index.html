@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>सेमेस्टर वाइज MCQ - हिंदी मीडियम</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Noto Sans Devanagari', Arial, sans-serif;
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4, #45b7d1);
+            min-height: 100vh;
+            color: #2c3e50;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;700&display=swap');
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        
+        .header {
+            text-align: center; color: white; margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .header p { font-size: 1.2em; }
+
+        .filters {
+            background: white; padding: 30px; border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1); margin-bottom: 30px;
+        }
+
+        .filter-row {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px; justify-items: center; margin-bottom: 20px;
+        }
+
+        .filter-group label { 
+            font-weight: bold; color: #555; font-size: 1.1em; display: block; margin-bottom: 8px;
+        }
+        select, button {
+            padding: 15px 20px; font-size: 1.1em; border: 2px solid #ddd;
+            border-radius: 12px; background: #f8f9fa; cursor: pointer;
+            transition: all 0.3s ease; width: 100%; font-family: inherit;
+        }
+        select:focus { outline: none; border-color: #ff6b6b; box-shadow: 0 0 15px rgba(255,107,107,0.3); }
+        button {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e); color: white;
+            border: none; font-weight: bold;
+        }
+        button:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(255,107,107,0.4); }
+
+        .semester-header {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d); color: white;
+            padding: 25px; text-align: center; border-radius: 15px; margin-bottom: 20px;
+        }
+
+        .questions-container {
+            display: none; background: white; border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1); overflow: hidden;
+        }
+
+        .question-card {
+            padding: 30px; border-bottom: 2px solid #f1f3f4; position: relative;
+        }
+        .question-card:nth-child(even) { background: #f8f9fa; }
+        
+        .question {
+            font-size: 1.3em; font-weight: bold; margin-bottom: 25px;
+            color: #2c3e50; line-height: 1.5;
+        }
+
+        .options { display: flex; flex-direction: column; gap: 15px; margin-bottom: 25px; }
+        .option {
+            padding: 20px; background: #f8f9fa; border: 2px solid #e9ecef;
+            border-radius: 12px; cursor: pointer; transition: all 0.3s ease;
+            font-size: 1.1em;
+        }
+        .option:hover { background: #e3f2fd; border-color: #4ecdc4; transform: translateX(5px); }
+        .option input[type="radio"] { margin-right: 15px; transform: scale(1.3); accent-color: #ff6b6b; }
+
+        .answer {
+            display: none; background: linear-gradient(45deg, #d4edda, #c3e6cb);
+            border: 2px solid #28a745; padding: 20px; border-radius: 12px;
+            margin-top: 20px; font-weight: 500;
+        }
+        .answer.show { display: block; animation: slideDown 0.3s ease; }
+
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .show-answer {
+            background: #28a745; padding: 12px 25px; border: none;
+            border-radius: 8px; color: white; cursor: pointer; font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .show-answer:hover { background: #218838; transform: scale(1.05); }
+
+        .stats {
+            display: flex; gap: 20px; justify-content: center; padding: 20px;
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e); color: white;
+            font-weight: bold; font-size: 1.1em; flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            .filter-row { grid-template-columns: 1fr; }
+            .header h1 { font-size: 2em; }
+            .stats { flex-direction: column; gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 सेमेस्टर वाइज MCQ</h1>
+            <p>हिंदी मीडियम - 11वीं & 12वीं कक्षा | Semester-wise Practice</p>
+        </div>
+
+        <div class="filters">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label>कक्षा:</label>
+                    <select id="classSelect">
+                        <option value="">कक्षा चुनें</option>
+                        <option value="11th">🧑‍🎓 कक्षा 11वीं</option>
+                        <option value="12th">👨‍🎓 कक्षा 12वीं</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>विषय:</label>
+                    <select id="subjectSelect" disabled>
+                        <option value="">पहले कक्षा चुनें</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>सेमेस्टर:</label>
+                    <select id="semesterSelect" disabled>
+                        <option value="">पहले विषय चुनें</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <button onclick="loadQuestions()">🚀 प्रश्न लोड करें</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="questionsContainer" class="questions-container">
+            <div class="semester-header">
+                <h2 id="quizTitle">प्रश्न लोड हो रहे हैं...</h2>
+                <div class="stats">
+                    <span>📊 कुल प्रश्न: <span id="totalQuestions">0</span></span>
+                    <span>✅ उत्तर दिए: <span id="answeredCount">0</span></span>
+                    <span id="scoreDisplay" style="display:none;">🏆 स्कोर: <span id="score">0</span></span>
+                </div>
+            </div>
+            <div id="questionsList"></div>
+            <div style="padding:20px; text-align:center;">
+                <button onclick="calculateScore()" style="background:#4ecdc4; padding:15px 40px; font-size:1.2em; margin-right:10px;">📊 परिणाम देखें</button>
+                <button onclick="resetQuiz()" style="background:#6c757d; padding:15px 40px; font-size:1.2em;">🔄 नया क्विज</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ✅ FIXED: Semester Data - Properly Structured
+        const semesterData = {
+            '11th': {
+                'भौतिकी': {
+                    sem1: generateRealQuestions('भौतिकी', '11th', 'सेमेस्टर 1'),
+                    sem2: generateRealQuestions('भौतिकी', '11th', 'सेमेस्टर 2')
+                },
+                'रसायन': {
+                    sem1: generateRealQuestions('रसायन', '11th', 'सेमेस्टर 1'),
+                    sem2: generateRealQuestions('रसायन', '11th', 'सेमेस्टर 2')
+                },
+                'जीवविज्ञान': {
+                    sem1: generateRealQuestions('जीवविज्ञान', '11th', 'सेमेस्टर 1'),
+                    sem2: generateRealQuestions('जीवविज्ञान', '11th', 'सेमेस्टर 2')
+                },
+                'गणित': {
+                    sem1: generateRealQuestions('गणित', '11th', 'सेमेस्टर 1'),
+                    sem2: generateRealQuestions('गणित', '11th', 'सेमेस्टर 2')
+                },
+                'हिंदी': {
+                    sem1: generateRealQuestions('हिंदी', '11th', 'सेमेस्टर 1'),
+                    sem2: generateRealQuestions('हिंदी', '11th', 'सेमेस्टर 2')
+                }
+            },
+            '12th': {
+                'भौतिकी': {
+                    sem1: generateRealQuestions('भौतिकी', '12th', 'सेमेस्टर 1'),
+                    sem2: generateRealQuestions('भौतिकी', '12th', 'सेमेस्टर 2')
+                },
+                'रसायन': {
+                    sem1: generateRealQuestions('रसायन', '12th', 'सेमेस्टर 1'),
+                    sem2: generateRealQuestions('रसायन', '12th', 'सेमेस्टर 2')
+                },
+                'जीवविज्ञान': {
+                    sem1: generateRealQuestions('जीवविज्ञान', '12th', 'सेमेस्टर 1'),
+                    sem2: generateRealQuestions('जीवविज्ञान', '12th', 'सेमेस्टर 2')
+                },
+                'गणित': {
+                    sem1: generateRealQuestions('गणित', '12th', 'सेमेस्टर 1'),
+                    sem2: generateRealQuestions('गणित', '12th', 'सेमेस्टर 2')
+                },
+                'हिंदी': {
+                    sem1: generateRealQuestions('हिंदी', '12th', 'सेमेस्टर 1'),
+                    sem2: generateRealQuestions('हिंदी', '12th', 'सेमेस्टर 2')
+                }
+            }
+        };
+
+        // ✅ FIXED: Real Hindi Questions Generator
+        function generateRealQuestions(subject, className, semesterName) {
+            const realQuestions = {
+                'भौतिकी': {
+                    'सेमेस्टर 1': [
+                        {q: 'न्यूटन का प्रथम गति नियम क्या कहता है?', opts: ['वस्तु स्थिर रहती है', 'त्वरण = बल/द्रव्यमान', 'क्रिया-प्रतिक्रिया बराबर', 'गति संरक्षित'], ans: 0},
+                        {q: 'कार्य का SI मात्रक?', opts: ['जूल', 'वाट', 'न्यूटन', 'किलोग्राम'], ans: 0}
+                    ],
+                    'सेमेस्टर 2': [
+                        {q: 'ओम का नियम?', opts: ['V=IR', 'P=VI', 'Q=CV', 'F=ma'], ans: 0},
+                        {q: 'लेंस सूत्र?', opts: ['1/f=1/v-1/u', '1/f=1/v+1/u', 'f=v+u', 'f=vu'], ans: 1}
+                    ]
+                },
+                'रसायन': {
+                    'सेमेस्टर 1': [
+                        {q: 'परमाणु संख्या कार्बन की?', opts: ['6', '12', '14', '8'], ans: 0},
+                        {q: 'pH=7 का पदार्थ?', opts: ['क्षारीय', 'अम्ल', 'उभयलवण', 'तटस्थ'], ans: 2}
+                    ],
+                    'सेमेस्टर 2': [
+                        {q: 'इथेनॉल का सूत्र?', opts: ['C₂H₅OH', 'CH₃COOH', 'C₆H₆', 'C₂H₄'], ans: 0}
+                    ]
+                },
+                'जीवविज्ञान': {
+                    'सेमेस्टर 1': [
+                        {q: 'DNA का पूरा नाम?', opts: ['डिऑक्सीराइबो न्यूक्लिक अम्ल', 'डाइऑक्सीराइबो न्यूक्लिक अम्ल', 'डिऑक्सी राइबो न्यूक्लिक अम्ल', 'डाइऑक्सी राइबो न्यूक्लिक अम्ल'], ans: 0},
+                        {q: 'इंसुलिन बनाता है?', opts: ['अग्न्याशय', 'थायरॉइड', 'पिट्यूटरी', 'एड्रीनल'], ans: 0}
+                    ],
+                    'सेमेस्टर 2': [
+                        {q: 'माइटोसिस में बेटे कोशिकाएँ?', opts: ['2 समान', '2 असमान', '4 समान', '4 असमान'], ans: 0}
+                    ]
+                },
+                'गणित': {
+                    'सेमेस्टर 1': [
+                        {q: 'sin 30° = ?', opts: ['1/2', '√3/2', '1', '0'], ans: 0},
+                        {q: 'lim x→0 sinx/x = ?', opts: ['0', '1', '∞', '-1'], ans: 1}
+                    ],
+                    'सेमेस्टर 2': [
+                        {q: '∫x dx = ?', opts: ['x²/2+C', 'x²+C', '2x+C', 'x+C'], ans: 0}
+                    ]
+                },
+                'हिंदी': {
+                    'सेमेस्टर 1': [
+                        {q: 'आदि कवि कौन?', opts: ['वाल्मीकि', 'तुलसीदास', 'कबीर', 'सूरदास'], ans: 0},
+                        {q: '"महेश" संधि विच्छेद?', opts: ['महा+ईश', 'मह+ईश', 'महेश्', 'महा+इश'], ans: 0}
+                    ],
+                    'सेमेस्टर 2': [
+                        {q: 'रस के कितने भेद?', opts: ['9', '8', '10', '7'], ans: 0}
+                    ]
+                }
+            };
+
+            const baseQuestions = realQuestions[subject]?.[semesterName] || [{q: `${subject} ${semesterName} प्रश्न`, opts: ['A', 'B', 'C', 'D'], ans: 0}];
+            const questions = [];
+            
+            // Generate 25 questions using base questions
+            for(let i = 0; i < 25; i++) {
+                const baseQ = baseQuestions[i % baseQuestions.length];
+                questions.push({
+                    id: i+1,
+                    question: baseQ.q,
+                    options: baseQ.opts,
+                    correctAnswer: baseQ.ans,
+                    explanation: `✅ सही उत्तर: ${String.fromCharCode(65 + baseQ.ans)}. ${subject} ${className} ${semesterName}`
+                });
+            }
+            return questions;
+        }
+
+        let currentClass = '', currentSubject = '', currentSemester = [], currentQuestions = [];
+
+        // ✅ FIXED Event Listeners
+        document.getElementById('classSelect').addEventListener('change', updateSubjects);
+        document.getElementById('subjectSelect').addEventListener('change', updateSemesters);
+
+        function updateSubjects() {
+            const className = document.getElementById('classSelect').value;
+            const subjectSelect = document.getElementById('subjectSelect');
+            const semesterSelect = document.getElementById('semesterSelect');
+            
+            subjectSelect.innerHTML = '<option value="">विषय चुनें</option>';
+            semesterSelect.innerHTML = '<option value="">सेमेस्टर चुनें</option>';
+            subjectSelect.disabled = !className;
+            semesterSelect.disabled = true;
+            console.log('Class changed:', className); // Debug
+            
+            if(className && semesterData[className]) {
+                Object.keys(semesterData[className]).forEach(subject => {
+                    const option = document.createElement('option');
+                    option.value = subject;
+                    option.textContent = subject;
+                    subjectSelect.appendChild(option);
+                });
+                console.log('Subjects loaded:', Object.keys(semesterData[className]));
+            }
+        }
+
+        function updateSemesters() {
+            const className = document.getElementById('classSelect').value;
+            const subject = document.getElementById('subjectSelect').value;
+            const semesterSelect = document.getElementById('semesterSelect');
+            
+            semesterSelect.innerHTML = '<option value="">सेमेस्टर चुनें</option>';
+            semesterSelect.disabled = !subject || !className;
+            console.log('Subject changed:', subject, 'Class:', className); // Debug
+            
+            if(subject && className && semesterData[className][subject]) {
+                const semesters = Object.keys(semesterData[className][subject]);
+                semesters.forEach((sem, index) => {
+                    const option = document.createElement('option');
+                    option.value = sem;
+                    option.textContent = index === 0 ? '📖 सेमेस्टर 1' : '📘 सेमेस्टर 2';
+                    semesterSelect.appendChild(option);
+                });
+                console.log('Semesters loaded:', semesters);
+            }
+        }
+
+        function loadQuestions() {
+            currentClass = document.getElementById('classSelect').value;
+            currentSubject = document.getElementById('subjectSelect').value;
+            currentSemester = document.getElementById('semesterSelect').value;
+            
+            console.log('Loading:', currentClass, currentSubject, currentSemester); // Debug
+            
+            if(!currentClass || !currentSubject || !currentSemester) {
+                alert('❌ सभी dropdown भरें!');
+                return;
+            }
+
+            currentQuestions = semesterData[currentClass][currentSubject][currentSemester];
+            displayQuestions();
+            document.getElementById('questionsContainer').style.display = 'block';
+        }
+
+        function displayQuestions() {
+            const container = document.getElementById('questionsList');
+            const title = document.getElementById('quizTitle');
+            const totalQ = document.getElementById('totalQuestions');
+            
+            title.textContent = `${currentClass} ${currentSubject} ${currentSemester === 'sem1' ? 'सेमेस्टर 1' : 'सेमेस्टर 2'}`;
+            totalQ.textContent = currentQuestions.length;
+            container.innerHTML = '';
+            
+            currentQuestions.forEach((q, index) => {
+                const div = document.createElement('div');
+                div.className = 'question-card';
+                div.innerHTML = `
+                    <div class="question">Q${index+1}. ${q.question}</div>
+                    <div class="options">
+                        ${q.options.map((opt, i) => 
+                            `<label class="option">
+                                <input type="radio" name="q${index}" value="${i}">
+                                ${opt}
+                            </label>`
+                        ).join('')}
+                    </div>
+                    <button class="show-answer" onclick="showAnswer(${index})">✅ उत्तर देखें</button>
+                    <div class="answer" id="answer${index}">${q.explanation}</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        window.showAnswer = function(index) {
+            const answerDiv = document.getElementById(`answer${index}`);
+            const selected = document.querySelector(`input[name="q${index}"]:checked`);
+            
+            if(!selected) return alert('❌ विकल्प चुनें!');
+            
+            const isCorrect = parseInt(selected.value) === currentQuestions[index].correctAnswer;
+            answerDiv.innerHTML = isCorrect ? 
+                `<strong style="color:#28a745;">✅ सही!</strong><br>${currentQuestions[index].explanation}` :
+                `<strong style="color:#dc3545;">❌ गलत!</strong><br>${currentQuestions[index].explanation}`;
+            answerDiv.classList.add('show');
+        }
+
+        window.calculateScore = function() {
+            let score = 0;
+            currentQuestions.forEach((q, i) => {
+                const sel = document.querySelector(`input[name="q${i}"]:checked`);
+                if(sel && parseInt(sel.value) === q.correctAnswer) score++;
+            });
+            document.getElementById('score').textContent = `${score}/${currentQuestions.length}`;
+            document.getElementById('scoreDisplay').style.display = 'inline';
+            alert(`🎉 स्कोर: ${score}/${currentQuestions.length}`);
+        }
+
+        window.resetQuiz = function() {
+            document.getElementById('questionsContainer').style.display = 'none';
+            updateSubjects();
+        }
+
+        // Real-time answered count
+        document.addEventListener('change', function(e) {
+            if(e.target.type === 'radio') {
+                const answered = document.querySelectorAll('input[type="radio"]:checked').length;
+                document.getElementById('answeredCount').textContent = answered;
+            }
+        });
+
+        window.addEventListener('load', () => {
+            console.log('✅ App Loaded Successfully!');
+            document.getElementById('classSelect').focus();
+        });
+    </script>
+</body>
+</html>
